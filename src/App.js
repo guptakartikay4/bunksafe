@@ -1,23 +1,20 @@
-import logo from './logo.svg';
-import './App.css';
-
 function App() {
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+    <div style={{
+      textAlign: 'center', 
+      marginTop: '100px',
+      backgroundColor: '#1a1a2e',
+      minHeight: '100vh',
+      color: 'white',
+      fontFamily: 'Arial, sans-serif'
+    }}>
+      <h1 style={{fontSize: '48px'}}>🎓 BunkSafe</h1>
+      <p style={{fontSize: '20px', color: '#a0a0a0'}}>
+        Bunk Smarter, Not Harder
+      </p>
+      <p style={{fontSize: '16px', color: '#4ecca3'}}>
+        Built by BunkSquad 🚀
+      </p>
     </div>
   );
 }
