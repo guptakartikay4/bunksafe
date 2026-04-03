@@ -1,38 +1,96 @@
-.App {
-  text-align: center;
-}
-
-.App-logo {
-  height: 40vmin;
-  pointer-events: none;
-}
-
-@media (prefers-reduced-motion: no-preference) {
-  .App-logo {
-    animation: App-logo-spin infinite 20s linear;
-  }
-}
-
-.App-header {
-  background-color: #282c34;
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  font-size: calc(10px + 2vmin);
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+  background-color: #1a1a2e;
   color: white;
 }
 
-.App-link {
-  color: #61dafb;
+/* LOGIN PAGE */
+.login-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
 }
 
-@keyframes App-logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
+.login-box {
+  background: #16213e;
+  padding: 40px;
+  border-radius: 12px;
+  width: 300px;
+  text-align: center;
+}
+
+.login-box h1 {
+  margin-bottom: 5px;
+}
+
+.login-box p {
+  margin-bottom: 20px;
+  font-size: 14px;
+  color: #ccc;
+}
+
+.login-box input {
+  width: 100%;
+  padding: 10px;
+  margin: 8px 0;
+  border-radius: 6px;
+  border: none;
+}
+
+.login-box button {
+  width: 100%;
+  padding: 10px;
+  margin-top: 10px;
+  border: none;
+  border-radius: 6px;
+  background-color: #0f3460;
+  color: white;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+.login-box button:hover {
+  background-color: #533483;
+}
+
+.google-btn {
+  background-color: #db4437;
+}
+
+.google-btn:hover {
+  background-color: #c1351d;
+}
+
+.error {
+  color: red;
+  margin-top: 10px;
+  font-size: 12px;
+}
+
+.toggle {
+  margin-top: 15px;
+  font-size: 14px;
+}
+
+.toggle span {
+  color: #00adb5;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+/* DASHBOARD */
+.dashboard {
+  text-align: center;
+  margin-top: 100px;
+}
+
+.dashboard button {
+  padding: 10px 20px;
+  background-color: #e94560;
+  border: none;
+  border-radius: 6px;
+  color: white;
+  cursor: pointer;
 }
