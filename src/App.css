@@ -1,24 +1,43 @@
+:root {
+  --bg: #1a1a2e;
+  --card: #16213e;
+  --primary: #4ecca3;
+  --text: #ffffff;
+  --danger: #e74c3c;
+  --warn: #ffc107;
+}
+/* 🔥 GLOBAL */
 body {
   margin: 0;
   font-family: Arial, sans-serif;
-  background-color: #1a1a2e;
+  background: #1a1a2e;
   color: white;
 }
 
-/* LOGIN PAGE */
+/* ================= LOGIN ================= */
+
+/* ================= LOGIN PAGE ================= */
+
 .login-container {
+  height: 100vh;
   display: flex;
   justify-content: center;
   align-items: center;
-  height: 100vh;
+  background: #1a1a2e;
 }
 
 .login-box {
   background: #16213e;
   padding: 40px;
   border-radius: 12px;
-  width: 300px;
+  width: 90%;
+  max-width: 400px;
   text-align: center;
+  color: white;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
 }
 
 .login-box h1 {
@@ -26,71 +45,288 @@ body {
 }
 
 .login-box p {
-  margin-bottom: 20px;
-  font-size: 14px;
   color: #ccc;
+  margin-bottom: 10px;
 }
 
 .login-box input {
   width: 100%;
   padding: 10px;
-  margin: 8px 0;
   border-radius: 6px;
   border: none;
+  outline: none;
 }
 
 .login-box button {
   width: 100%;
   padding: 10px;
-  margin-top: 10px;
+  background: #4ecca3;
   border: none;
   border-radius: 6px;
-  background-color: #0f3460;
-  color: white;
   cursor: pointer;
   font-weight: bold;
+  transition: 0.2s;
 }
 
 .login-box button:hover {
-  background-color: #533483;
+  opacity: 0.9;
 }
 
 .google-btn {
-  background-color: #db4437;
-}
-
-.google-btn:hover {
-  background-color: #c1351d;
-}
-
-.error {
-  color: red;
-  margin-top: 10px;
-  font-size: 12px;
+  background: #ffffff;
+  color: black;
 }
 
 .toggle {
-  margin-top: 15px;
+  margin-top: 10px;
   font-size: 14px;
 }
 
 .toggle span {
-  color: #00adb5;
+  color: #4ecca3;
   cursor: pointer;
   font-weight: bold;
 }
 
-/* DASHBOARD */
-.dashboard {
-  text-align: center;
-  margin-top: 100px;
+.error {
+  color: #ff4d4d;
+  font-size: 14px;
 }
 
-.dashboard button {
-  padding: 10px 20px;
-  background-color: #e94560;
+/* ================= DASHBOARD ================= */
+
+.dashboard {
+  min-height: 100vh;
+  background: #1a1a2e;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 20px;
+}
+
+.top-card {
+  background: #16213e;
+  padding: 20px;
+  border-radius: 12px;
+  text-align: center;
+  width: 90%;
+  max-width: 800px;
+  margin-bottom: 20px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+}
+
+.subjects {
+  width: 90%;
+  max-width: 800px;
+}
+
+.subject-card {
+  background: #16213e;
+  padding: 15px;
+  border-radius: 12px;
+  margin-bottom: 15px;
+  box-shadow: 0 3px 8px rgba(0,0,0,0.2);
+}
+
+.progress {
+  background: #333;
+  height: 10px;
+  border-radius: 10px;
+  overflow: hidden;
+  margin: 10px 0;
+}
+
+.progress-bar {
+  height: 10px;
+}
+
+.today {
+  width: 90%;
+  max-width: 800px;
+  margin-top: 20px;
+}
+
+.today-card {
+  background: #16213e;
+  padding: 10px;
+  border-radius: 10px;
+  margin-bottom: 10px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.today-card button {
+  margin-left: 5px;
+  padding: 5px 10px;
   border: none;
   border-radius: 6px;
-  color: white;
   cursor: pointer;
+}
+
+.bottom-nav {
+  margin-top: 20px;
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.bottom-nav button {
+  padding: 10px 15px;
+  background: #4ecca3;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+/* ================= TIMETABLE ================= */
+
+.timetable-container {
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.timetable-card {
+  background: #16213e;
+  padding: 30px;
+  border-radius: 12px;
+  width: 90%;
+  max-width: 700px;
+}
+
+.form-row {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+}
+
+.form-row input,
+.form-row select {
+  padding: 10px;
+  border-radius: 6px;
+  border: none;
+}
+
+.form-row button {
+  background: #4ecca3;
+  border: none;
+  padding: 10px 15px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.day-group {
+  margin-bottom: 15px;
+}
+
+.class-item {
+  display: flex;
+  justify-content: space-between;
+  background: #0f3460;
+  padding: 10px;
+  border-radius: 6px;
+  margin-top: 5px;
+}
+
+.class-item button {
+  background: none;
+  border: none;
+  color: red;
+  cursor: pointer;
+}
+
+.save-btn {
+  width: 100%;
+  margin-top: 20px;
+  padding: 12px;
+  background: #4ecca3;
+  border: none;
+  border-radius: 8px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+/* ================= ATTENDANCE ================= */
+
+.attendance-container {
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.attendance-card {
+  background: #16213e;
+  padding: 30px;
+  border-radius: 12px;
+  width: 90%;
+  max-width: 600px;
+}
+
+.attendance-row {
+  margin-bottom: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.attendance-row input {
+  padding: 10px;
+  border-radius: 6px;
+  border: none;
+}
+
+.percentage {
+  font-weight: bold;
+}
+
+/* ================= RESPONSIVE ================= */
+
+@media (max-width: 600px) {
+  .form-row {
+    flex-direction: column;
+  }
+
+  .bottom-nav {
+    flex-direction: column;
+    align-items: center;
+  }
+}
+.empty-state {
+  height: 80vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 15px;
+  color: white;
+  text-align: center;
+}
+
+.primary-btn {
+  padding: 12px 20px;
+  background: #4ecca3;
+  border: none;
+  border-radius: 8px;
+  font-weight: bold;
+  cursor: pointer;
+}
+.spinner {
+  border: 4px solid #eee;
+  border-top: 4px solid #4ecca3;
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  animation: spin 1s linear infinite;
+  margin: 40px auto;
+}
+
+@keyframes spin {
+  100% {
+    transform: rotate(360deg);
+  }
 }

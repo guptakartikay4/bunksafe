@@ -9,13 +9,17 @@ import {
 import { auth } from "./firebase";
 import { onAuthStateChanged } from "firebase/auth";
 
+// Components
 import Login from "./components/Login";
 import Dashboard from "./components/Dashboard";
+import TimetableSetup from "./components/TimetableSetup";
+import AttendanceSetup from "./components/AttendanceSetup";
 
 function App() {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
 
+  // 🔥 Listen to Firebase auth state
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
       setUser(currentUser);
@@ -25,7 +29,7 @@ function App() {
     return unsubscribe;
   }, []);
 
-  // Block UI until auth is ready
+  // ⏳ Show loading while checking auth
   if (loading) {
     return (
       <div
@@ -46,15 +50,31 @@ function App() {
   return (
     <Router>
       <Routes>
+
+        {/* 🔐 Login */}
         <Route
           path="/"
           element={!user ? <Login /> : <Navigate to="/dashboard" />}
         />
 
+        {/* 🏠 Dashboard */}
         <Route
           path="/dashboard"
           element={user ? <Dashboard /> : <Navigate to="/" />}
         />
+
+        {/* 📅 Timetable Setup */}
+        <Route
+          path="/timetable-setup"
+          element={user ? <TimetableSetup /> : <Navigate to="/" />}
+        />
+
+        {/* 📊 Attendance Setup (NEW) */}
+        <Route
+          path="/attendance-setup"
+          element={user ? <AttendanceSetup /> : <Navigate to="/" />}
+        />
+
       </Routes>
     </Router>
   );

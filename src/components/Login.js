@@ -26,7 +26,7 @@ function Login() {
         await signInWithEmailAndPassword(auth, email, password);
       }
     } catch (err) {
-      setError(err.message);
+      setError("Invalid email or password");
     }
   };
 
@@ -59,7 +59,9 @@ function Login() {
     <div className="login-container">
       <div className="login-box">
         <h1>BunkSafe</h1>
-        <p>Bunk Smarter, Not Harder</p>
+        <p style={{ opacity: 0.7 }}>
+          Bunk Smarter, Not Harder
+        </p>
 
         <form onSubmit={handleSubmit}>
           <input
