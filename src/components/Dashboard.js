@@ -13,10 +13,11 @@ import "../App.css";
 function Dashboard() {
   const navigate = useNavigate();
 
-  const [attendance, setAttendance] = useState([]);
+  const [attendance, setAttendance] = useState({});
   const [timetable, setTimetable] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(""); // ✅ added
+  const [error, setError] = useState(""); 
+  const [marked, setMarked] = useState({});
 
   useEffect(() => {
     const fetchData = async () => {
@@ -24,16 +25,32 @@ function Dashboard() {
       if (!user) return;
 
       try {
-        const attendanceSnap = await getDocs(
-          collection(db, "users", user.uid, "attendance")
-        );
+     const snap = await getDocs(
+  collection(db, "users", user.uid, "attendance")
+);
 
-        const attendanceData = attendanceSnap.docs.map((doc) => ({
-          id: doc.id,
-          ...doc.data(),
-        }));
+const data = {};
 
-        setAttendance(attendanceData);
+snap.forEach((docSnap) => {
+  const d = docSnap.data();
+
+  const key = docSnap.id.trim().toLowerCase();
+
+  data[key] = {
+    subjectName: d.subjectName || docSnap.id,
+    totalClasses: Number(d.totalClasses) || 0,
+    attendedClasses: Number(d.attendedClasses) || 0,
+    percentage:
+      d.percentage !== undefined
+        ? Number(d.percentage)
+        : d.totalClasses > 0
+        ? (d.attendedClasses / d.totalClasses) * 100
+        : 0,
+  };
+});
+
+setAttendance(data);
+console.log("attendance:", data);
 
         const timetableDoc = await getDoc(
           doc(db, "users", user.uid, "timetable", "data")
@@ -55,18 +72,20 @@ function Dashboard() {
   }, []);
 
   const overallPercentage = () => {
-    if (attendance.length === 0) return 0;
+  const subjects = Object.values(attendance);
 
-    let total = 0;
-    let attended = 0;
+  if (subjects.length === 0) return 0;
 
-    attendance.forEach((sub) => {
-      total += sub.totalClasses;
-      attended += sub.attendedClasses;
-    });
+  let total = 0;
+  let attended = 0;
 
-    return total === 0 ? 0 : ((attended / total) * 100).toFixed(1);
-  };
+  subjects.forEach((sub) => {
+total += Number(sub.totalClasses) || 0;
+attended += Number(sub.attendedClasses) || 0;
+  });
+
+  return total === 0 ? 0 : ((attended / total) * 100).toFixed(1);
+};
 
   const getStatus = (percent) => {
     if (percent >= 85) return "Safe ✅";
@@ -79,6 +98,32 @@ function Dashboard() {
     if (percent >= 75) return "#ffc107";
     return "#e74c3c";
   };
+  // 🔥 Risk forecast per subject
+const getRiskMessage = (percent) => {
+  if (percent < 75) {
+    return {
+      text: "Critical: Below required attendance",
+      color: "#e74c3c",
+    };
+  }
+  if (percent <= 80) {
+    return {
+      text: "Caution: One or two more bunks may put you at risk",
+      color: "#ffc107",
+    };
+  }
+  return {
+    text: "Safe zone",
+    color: "#4ecca3",
+  };
+};
+
+// 🔥 Overall trend
+const getOverallTrend = (percent) => {
+  if (percent < 75) return "Danger 🔴";
+  if (percent <= 80) return "Warning ⚠️";
+  return "Safe ✅";
+};
 
   // ✅ FIXED bunk calculation
   const getBunk = (attended, total) => {
@@ -99,7 +144,10 @@ function Dashboard() {
     const user = auth.currentUser;
 
     try {
-      const ref = doc(db, "users", user.uid, "attendance", subject);
+      const key = subject.trim().toLowerCase();
+
+      const ref = doc(db, "users", user.uid, "attendance", key);
+      
       const snap = await getDoc(ref);
 
       if (!snap.exists()) return;
@@ -119,17 +167,42 @@ function Dashboard() {
         attendedClasses: newAttended,
         percentage: Number(percentage),
       });
+    setAttendance((prev) => {
+  const updated = { ...prev };
 
-      window.location.reload();
+  if (!updated[subject]) return prev; // subject is already normalized key
+
+  updated[subject] = {
+    ...updated[subject],
+    totalClasses: newTotal,
+    attendedClasses: newAttended,
+    percentage: Number(percentage),
+  };
+
+  return updated;
+});
+
+      
 
     } catch (err) {
       console.error(err);
       setError("Failed to update attendance"); // ✅ added
     }
   };
+  const handleCancel = (subjectKey) => {
+  setMarked((prev) => ({ ...prev, [subjectKey]: true }));
+};
 
   const today = new Date().toLocaleString("en-US", { weekday: "long" });
-  const todaysClasses = timetable.filter((cls) => cls.day === today);
+  const todaysClasses = timetable.filter((cls) => {
+  const key = cls.subject.trim().toLowerCase();
+
+  return (
+    cls.day === today &&
+    attendance[key] // ✅ only show if exists in attendance
+  );
+});
+
 
   if (loading) {
     return <div className="spinner"></div>;
@@ -139,6 +212,17 @@ function Dashboard() {
   if (error) {
     return <p className="error">{error}</p>;
   }
+
+  if (Object.keys(attendance).length === 0) {
+  return (
+    <div className="empty-state">
+      <h2>No attendance data yet</h2>
+      <button onClick={() => navigate("/attendance-setup")}>
+        Add Attendance
+      </button>
+    </div>
+  );
+}
 
   if (timetable.length === 0) {
     return (
@@ -153,6 +237,7 @@ function Dashboard() {
   }
 
   const overall = overallPercentage();
+  console.log("FINAL ATTENDANCE:", attendance);
 
   return (
     <div className="dashboard">
@@ -160,11 +245,14 @@ function Dashboard() {
         <h2>Hi, {auth.currentUser?.email}! 👋</h2>
         <h1>{overall}%</h1>
         <p>{getStatus(overall)}</p>
+        <p>
+          Overall Trend: {getOverallTrend(overall)}
+        </p>
       </div>
 
       <div className="subjects">
-        {attendance.map((sub) => {
-          const percent = sub.percentage;
+        {Object.values(attendance).map((sub) => {
+          const percent = Number(sub.percentage) || 0;
           const bunk = getBunk(sub.attendedClasses, sub.totalClasses);
           const required = getRequired(
             sub.attendedClasses,
@@ -172,7 +260,7 @@ function Dashboard() {
           );
 
           return (
-            <div className="subject-card" key={sub.id}>
+            <div className="subject-card" key={sub.subjectName}>
               <h3>{sub.subjectName}</h3>
               <h2 style={{ color: getColor(percent) }}>{percent}%</h2>
 
@@ -199,36 +287,93 @@ function Dashboard() {
           );
         })}
       </div>
+      {/* 🔥 Risk Forecast Section */}
+<div className="subjects">
+  <h2 style={{ marginTop: "20px" }}>Risk Forecast</h2>
+
+  {Object.values(attendance).map((sub) => {
+    const percent = Number(sub.percentage) || 0;
+    const risk = getRiskMessage(percent);
+
+    return (
+      <div className="subject-card" key={sub.subjectName + "-risk"}>
+        <h3>{sub.subjectName}</h3>
+
+        <p style={{ color: risk.color }}>
+          {risk.text}
+        </p>
+      </div>
+    );
+  })}
+</div>
 
       <div className="today">
         <h2>Today's Classes</h2>
 
-        {todaysClasses.map((cls, i) => (
-          <div key={i} className="today-card">
-            <span>{cls.subject}</span>
+        {todaysClasses.map((cls, i) => {
+  const key = cls.subject.trim().toLowerCase();
 
-            <div>
-              <button onClick={() => markAttendance(cls.subject, "present")}>
-                ✅
-              </button>
-              <button onClick={() => markAttendance(cls.subject, "absent")}>
-                ❌
-              </button>
-            </div>
-          </div>
-        ))}
+  return (
+    <div key={cls.subject + i} className="today-card">
+      <span>{cls.subject}</span>
+
+      <div>
+        {/* ✅ PRESENT */}
+        <button
+          disabled={marked[key]}
+          onClick={() => {
+            markAttendance(key, "present");
+            setMarked((prev) => ({ ...prev, [key]: true }));
+          }}
+        >
+          ✅
+        </button>
+
+        {/* ⛔ CANCEL */}
+        <button
+          disabled={marked[key]}
+          onClick={() => handleCancel(key)}
+        >
+          ⛔
+        </button>
+
+        {/* ❌ ABSENT */}
+        <button
+          disabled={marked[key]}
+          onClick={() => {
+            markAttendance(key, "absent");
+            setMarked((prev) => ({ ...prev, [key]: true }));
+          }}
+        >
+          ❌
+        </button>
+      </div>
+    </div>
+  );
+})}
       </div>
 
       <div className="bottom-nav">
-        <button onClick={() => navigate("/plan")}>🧠 Plan</button>
+        <button onClick={() => navigate("/plan")}>🧠 Plan My Week</button>
         <button onClick={() => navigate("/friends")}>👥 Friends</button>
         <button onClick={() => navigate("/timetable-setup")}>
           ⚙️ Edit
         </button>
-        <button onClick={() => auth.signOut()}>🚪 Logout</button>
+        <button
+  onClick={async () => {
+    try {
+      await auth.signOut();
+      navigate("/");
+    } catch (err) {
+      console.error("Logout failed", err);
+    }
+  }}
+>
+  🚪 Logout
+</button>
       </div>
     </div>
-  );
+  )
 }
 
 export default Dashboard;

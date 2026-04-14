@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { db, auth } from "../firebase";
-import { doc, getDoc, collection, setDoc } from "firebase/firestore";
+import { doc, getDoc, collection, setDoc,getDocs } from "firebase/firestore";
 import { useNavigate } from "react-router-dom";
 import "../App.css";
 
@@ -8,55 +8,86 @@ function AttendanceSetup() {
   const navigate = useNavigate();
 
   const [subjects, setSubjects] = useState([]);
-  const [attendance, setAttendance] = useState({});
   const [error, setError] = useState(""); // ✅ added
+  const [attendanceData, setAttendanceData] = useState({});
 
   useEffect(() => {
-    const fetchTimetable = async () => {
-      const user = auth.currentUser;
-      if (!user) return;
+  const fetchData = async () => {
+    const user = auth.currentUser;
+    if (!user) return;
 
-      try {
-        const docRef = doc(db, "users", user.uid, "timetable", "data");
-        const docSnap = await getDoc(docRef);
+    try {
+      // 🔥 get timetable
+      const docRef = doc(db, "users", user.uid, "timetable", "data");
+      const docSnap = await getDoc(docRef);
 
-        if (docSnap.exists()) {
-          const data = docSnap.data().classes;
+      let timetableSubjects = [];
 
-          const uniqueSubjects = [
-            ...new Set(data.map((item) => item.subject)),
-          ];
-
-          setSubjects(uniqueSubjects);
-
-          const initial = {};
-          uniqueSubjects.forEach((sub) => {
-            initial[sub] = {
-              total: "",
-              attended: "",
-            };
-          });
-
-          setAttendance(initial);
-        }
-      } catch (err) {
-        console.error(err);
-        setError("Failed to load timetable"); // ✅ added
+      if (docSnap.exists()) {
+        timetableSubjects = docSnap
+          .data()
+          .classes.map((item) => item.subject);
       }
-    };
 
-    fetchTimetable();
-  }, []);
+      // 🔥 get attendance subjects
+      const attendanceSnap = await getDocs(
+        collection(db, "users", user.uid, "attendance")
+      );
 
-  const handleChange = (subject, field, value) => {
-    setAttendance({
-      ...attendance,
-      [subject]: {
-        ...attendance[subject],
-        [field]: value === "" ? "" : Number(value),
-      },
-    });
+      const attendanceSubjects = attendanceSnap.docs.map(
+        (doc) => doc.id
+      );
+
+      // 🔥 merge BOTH
+      const normalize = (s) => s.trim().toLowerCase();
+
+const allSubjects = [
+  ...new Map(
+    [...timetableSubjects, ...attendanceSubjects].map((s) => [
+      normalize(s),
+      s.trim(), // keep clean display
+    ])
+  ).values(),
+];
+
+      setSubjects(allSubjects);
+
+    } catch (err) {
+      console.error(err);
+      setError("Failed to load data");
+    }
   };
+
+  fetchData();
+}, []);
+  useEffect(() => {
+  const fetchAttendance = async () => {
+    const user = auth.currentUser;
+    if (!user) return;
+
+    try {
+      const snap = await getDocs(
+        collection(db, "users", user.uid, "attendance")
+      );
+
+      const data = {};
+
+     snap.forEach((doc) => {
+  const key = doc.id.trim().toLowerCase();
+  data[key] = doc.data();
+});
+
+      setAttendanceData(data);
+
+    } catch (err) {
+      console.error("Error fetching attendance:", err);
+    }
+  };
+
+  fetchAttendance();
+}, []);
+
+  
 
   const getPercentage = (total, attended) => {
     if (!total || total === 0) return 0;
@@ -85,17 +116,17 @@ function AttendanceSetup() {
       );
 
       for (let subject of subjects) {
-        const total = attendance[subject].total;
-        const attended = attendance[subject].attended;
+        const key = subject.trim().toLowerCase();
 
+const total = attendanceData[key]?.totalClasses ?? 0;
+const attended = attendanceData[key]?.attendedClasses ?? 0;
         if (attended > total) {
           setError(`Error in ${subject}: Attended cannot exceed total`); // ✅ updated
           return;
         }
 
         const percentage = getPercentage(total, attended);
-
-        await setDoc(doc(attendanceRef, subject), {
+        await setDoc(doc(attendanceRef, key), {
           subjectName: subject,
           totalClasses: Number(total),
           attendedClasses: Number(attended),
@@ -118,8 +149,11 @@ function AttendanceSetup() {
         <h2>Enter Your Attendance</h2>
 
         {subjects.map((subject) => {
-          const total = attendance[subject]?.total || "";
-          const attended = attendance[subject]?.attended || "";
+
+          const key = subject.trim().toLowerCase();
+
+          const total = attendanceData[key]?.totalClasses || 0;
+          const attended = attendanceData[key]?.attendedClasses || 0;
           const percent = getPercentage(total, attended);
 
           return (
@@ -130,20 +164,32 @@ function AttendanceSetup() {
               <input
                 type="number"
                 placeholder="Enter total classes"
-                value={total}
+                value={attendanceData[key]?.totalClasses || ""}
                 onChange={(e) =>
-                  handleChange(subject, "total", e.target.value)
-                }
+                   setAttendanceData({
+                     ...attendanceData,
+                     [key]: {
+                       ...attendanceData[key],
+                       totalClasses: Number(e.target.value)
+                     },
+  })
+}
               />
 
               <label>Classes Attended</label>
               <input
                 type="number"
                 placeholder="Enter attended classes"
-                value={attended}
+                value={attendanceData[key]?.attendedClasses || ""}
                 onChange={(e) =>
-                  handleChange(subject, "attended", e.target.value)
-                }
+  setAttendanceData({
+    ...attendanceData,
+    [key]: {
+      ...attendanceData[key],
+      attendedClasses: Number(e.target.value)
+    },
+  })
+}
               />
 
               <span

@@ -14,6 +14,7 @@ import Login from "./components/Login";
 import Dashboard from "./components/Dashboard";
 import TimetableSetup from "./components/TimetableSetup";
 import AttendanceSetup from "./components/AttendanceSetup";
+import PlanWeek from "./components/PlanWeek";
 
 function App() {
   const [user, setUser] = useState(null);
@@ -73,6 +74,10 @@ function App() {
         <Route
           path="/attendance-setup"
           element={user ? <AttendanceSetup /> : <Navigate to="/" />}
+        />
+        <Route
+          path="/plan"
+          element={user ? <PlanWeek /> : <Navigate to="/" />}
         />
 
       </Routes>

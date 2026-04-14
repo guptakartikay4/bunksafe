@@ -18,79 +18,132 @@ body {
 
 /* ================= LOGIN PAGE ================= */
 
+/* ================= LOGIN PAGE (IMPROVED UI) ================= */
+
 .login-container {
-  height: 100vh;
+  min-height: 100vh;
   display: flex;
   justify-content: center;
   align-items: center;
   background: #1a1a2e;
+  padding: 20px;
 }
 
 .login-box {
   background: #16213e;
-  padding: 40px;
-  border-radius: 12px;
-  width: 90%;
-  max-width: 400px;
+  padding: 40px 30px;
+  border-radius: 16px;
+  width: 100%;
+  max-width: 380px;
   text-align: center;
   color: white;
   display: flex;
   flex-direction: column;
-  gap: 12px;
-  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+  gap: 16px;
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.4);
 }
 
+/* Title */
 .login-box h1 {
-  margin-bottom: 5px;
+  margin: 0;
+  font-size: 28px;
+  font-weight: 600;
 }
 
 .login-box p {
-  color: #ccc;
+  color: #aaa;
+  font-size: 14px;
   margin-bottom: 10px;
 }
 
+/* Inputs */
 .login-box input {
   width: 100%;
-  padding: 10px;
-  border-radius: 6px;
-  border: none;
+  padding: 12px;
+  border-radius: 8px;
+  border: 1px solid transparent; /* prevents layout shift */
   outline: none;
+  background: #0f3460;
+  color: white;
+  font-size: 14px;
+  transition: border 0.2s ease;
 }
 
+.login-box input:focus {
+  border: 1px solid #4ecca3;
+}
+
+/* 🔥 Better spacing between inputs and button */
+.login-box input + input {
+  margin-top: 8px;
+}
+
+.login-box input + button {
+  margin-top: 14px;
+}
+
+.login-box input::placeholder {
+  color: #bbb;
+}
+
+/* Buttons (consistent style) */
 .login-box button {
   width: 100%;
-  padding: 10px;
+  padding: 12px;
   background: #4ecca3;
   border: none;
-  border-radius: 6px;
+  border-radius: 8px;
   cursor: pointer;
-  font-weight: bold;
-  transition: 0.2s;
+  font-weight: 600;
+  font-size: 14px;
+  transition: all 0.2s ease;
 }
 
 .login-box button:hover {
+  transform: translateY(-1px);
   opacity: 0.9;
 }
+.login-box button + button {
+  margin-top: 6px;
+}
 
-.google-btn {
-  background: #ffffff;
+/* Google button variant */
+.login-box .google-btn {
+  background: transparent;
+  border: 1.5px solid #4ecca3;
+  color: #4ecca3;
+  font-weight: 600;
+}
+
+.login-box .google-btn:hover {
+  background: #4ecca3;
   color: black;
 }
 
+/* Toggle text */
 .toggle {
   margin-top: 10px;
-  font-size: 14px;
+  font-size: 13px;
+  color: #ccc;
 }
 
 .toggle span {
   color: #4ecca3;
   cursor: pointer;
-  font-weight: bold;
+  font-weight: 600;
 }
 
+/* Error */
 .error {
   color: #ff4d4d;
-  font-size: 14px;
+  font-size: 13px;
+}
+
+/* Mobile tweak */
+@media (max-width: 480px) {
+  .login-box {
+    padding: 30px 20px;
+  }
 }
 
 /* ================= DASHBOARD ================= */
@@ -180,6 +233,15 @@ body {
   cursor: pointer;
 }
 
+.today-card button {
+  min-width: 40px;
+}
+
+.today-card button:last-child {
+  background: #888; /* Cancel button */
+  color: white;
+}
+
 /* ================= TIMETABLE ================= */
 
 .timetable-container {
@@ -248,6 +310,19 @@ body {
   border-radius: 8px;
   font-weight: bold;
   cursor: pointer;
+}
+.time-input {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.time-input select {
+  padding: 10px;
+  border-radius: 6px;
+  border: none;
+  background: #0f3460;
+  color: white;
 }
 
 /* ================= ATTENDANCE ================= */
@@ -326,6 +401,9 @@ body {
 }
 
 @keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
   100% {
     transform: rotate(360deg);
   }
