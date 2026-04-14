@@ -49,6 +49,7 @@ snap.forEach((docSnap) => {
   };
 });
 
+
 setAttendance(data);
 console.log("attendance:", data);
 
@@ -70,6 +71,16 @@ console.log("attendance:", data);
 
     fetchData();
   }, []);
+
+  useEffect(() => {
+  if (!loading) {
+    if (timetable.length === 0) {
+      navigate("/timetable-setup");
+    } else if (Object.keys(attendance).length === 0) {
+      navigate("/attendance-setup");
+    }
+  }
+}, [loading, timetable, attendance, navigate]);
 
   const overallPercentage = () => {
   const subjects = Object.values(attendance);
@@ -213,28 +224,8 @@ const getOverallTrend = (percent) => {
     return <p className="error">{error}</p>;
   }
 
-  if (Object.keys(attendance).length === 0) {
-  return (
-    <div className="empty-state">
-      <h2>No attendance data yet</h2>
-      <button onClick={() => navigate("/attendance-setup")}>
-        Add Attendance
-      </button>
-    </div>
-  );
-}
 
-  if (timetable.length === 0) {
-    return (
-      <div className="empty-state">
-        <h2>Welcome 👋</h2>
-        <p>You haven’t added your timetable yet.</p>
-        <button onClick={() => navigate("/timetable-setup")}>
-          Setup My Timetable
-        </button>
-      </div>
-    );
-  }
+  
 
   const overall = overallPercentage();
   console.log("FINAL ATTENDANCE:", attendance);
