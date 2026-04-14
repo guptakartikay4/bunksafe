@@ -20,9 +20,10 @@ ${subjects
 
 Give a short 2-3 line recommendation on whether the student should bunk and what to be careful about.
 `;
+    const API_KEY = process.env.REACT_APP_GEMINI_API_KEY;
 
     const response = await fetch(
-      "https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=YOUR_API_KEY",
+  `https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=${API_KEY}`,
       {
         method: "POST",
         headers: {

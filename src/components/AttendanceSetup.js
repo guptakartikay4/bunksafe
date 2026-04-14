@@ -10,6 +10,7 @@ function AttendanceSetup() {
   const [subjects, setSubjects] = useState([]);
   const [error, setError] = useState(""); // ✅ added
   const [attendanceData, setAttendanceData] = useState({});
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
   const fetchData = async () => {
@@ -51,10 +52,12 @@ const allSubjects = [
 ];
 
       setSubjects(allSubjects);
+      setLoading(false); 
 
     } catch (err) {
       console.error(err);
       setError("Failed to load data");
+      setLoading(false);
     }
   };
 
@@ -86,6 +89,11 @@ const allSubjects = [
 
   fetchAttendance();
 }, []);
+useEffect(() => {
+  if (!loading && subjects.length === 0) {
+    navigate("/timetable-setup");
+  }
+}, [subjects, loading, navigate]);
 
   
 
@@ -142,6 +150,14 @@ const attended = attendanceData[key]?.attendedClasses ?? 0;
       setError("Failed to save attendance"); // ✅ updated
     }
   };
+  if (subjects.length === 0) {
+  return (
+    <div style={{ color: "white", textAlign: "center", marginTop: "50px" }}>
+      <h2>No subjects found</h2>
+      <p>Please setup your timetable first</p>
+    </div>
+  );
+}
 
   return (
     <div className="attendance-container">
